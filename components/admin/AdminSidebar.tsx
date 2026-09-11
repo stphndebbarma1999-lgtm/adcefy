@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
@@ -13,6 +13,7 @@ import {
   Boxes,
   Settings,
   ExternalLink,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -30,6 +31,13 @@ const navItems = [
 
 export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch("/api/admin-logout", { method: "POST" });
+    router.push("/admin-login");
+    router.refresh();
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -70,6 +78,13 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
           <ExternalLink size={16} />
           View Storefront
         </Link>
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted hover:bg-surface-muted hover:text-danger"
+        >
+          <LogOut size={16} />
+          Log Out
+        </button>
       </div>
     </div>
   );
