@@ -1,5 +1,5 @@
 import type { Product, ProductSpecification, ProductVariantGroup } from "@/types/product";
-import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { getAllProducts as getAllDemoProducts, getProductBySlug as getDemoProductBySlug } from "@/lib/data/products";
 
 /**
@@ -100,7 +100,7 @@ export function mapProductInputToRow(input: Partial<Omit<Product, "id" | "create
 }
 
 async function queryActiveProducts(): Promise<Product[] | null> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicClient();
   if (!supabase) return null;
 
   const { data, error } = await supabase
@@ -120,7 +120,7 @@ export async function getAllProductsAsync(): Promise<Product[]> {
 }
 
 export async function getProductBySlugAsync(slug: string): Promise<Product | undefined> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicClient();
   if (supabase) {
     const { data } = await supabase.from("products").select("*").eq("slug", slug).maybeSingle();
     if (data) return mapRowToProduct(data as ProductRow);
