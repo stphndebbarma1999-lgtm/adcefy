@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { ArrowRight, LayoutGrid } from "lucide-react";
 import { getCategories } from "@/lib/data/categories";
-import { getProductsByCategory } from "@/lib/data/products";
+import { getProductsByCategoryAsync } from "@/lib/data/products.repo";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
-export function CategoryGrid() {
+export async function CategoryGrid() {
   const categories = getCategories();
+  const counts = await Promise.all(categories.map((category) => getProductsByCategoryAsync(category.slug)));
 
   return (
     <section className="container-page py-10">
@@ -16,8 +17,8 @@ export function CategoryGrid() {
         </Link>
       </div>
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-        {categories.map((category) => {
-          const count = getProductsByCategory(category.slug).length;
+        {categories.map((category, index) => {
+          const count = counts[index].length;
           return (
             <Link
               key={category.id}

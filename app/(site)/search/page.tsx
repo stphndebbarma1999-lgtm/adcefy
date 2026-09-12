@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { searchProducts } from "@/lib/data/products";
+import { searchProductsAsync } from "@/lib/data/products.repo";
 import { ProductGrid } from "@/components/product/ProductGrid";
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q = "" } = await searchParams;
-  const results = searchProducts(q);
+  const results = await searchProductsAsync(q);
 
   return (
     <div className="container-page py-8">

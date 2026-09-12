@@ -49,7 +49,9 @@ export default function AdminInventoryPage() {
                     onChange={(e) => setDrafts((d) => ({ ...d, [product.id]: e.target.value }))}
                     onBlur={(e) => {
                       const value = Math.max(0, Number(e.target.value) || 0);
-                      adjustStock(product.id, value);
+                      adjustStock(product.id, value).catch((err) => {
+                        alert(err instanceof Error ? err.message : "Failed to update stock.");
+                      });
                       setDrafts((d) => ({ ...d, [product.id]: String(value) }));
                     }}
                     className="h-9 w-20 rounded-lg border border-border px-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"

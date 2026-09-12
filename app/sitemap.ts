@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
 import { getCategories } from "@/lib/data/categories";
-import { getAllProducts } from "@/lib/data/products";
+import { getAllProductsAsync } from "@/lib/data/products.repo";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     "",
     "/search",
@@ -26,7 +26,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(),
   }));
 
-  const productRoutes = getAllProducts().map((p) => ({
+  const allProducts = await getAllProductsAsync();
+  const productRoutes = allProducts.map((p) => ({
     url: `${siteConfig.url}/product/${p.slug}`,
     lastModified: p.updatedAt,
   }));

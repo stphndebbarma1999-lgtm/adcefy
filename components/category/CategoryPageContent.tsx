@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getCategoryBySlug } from "@/lib/data/categories";
-import { getProductsByCategory } from "@/lib/data/products";
+import { getProductsByCategoryAsync } from "@/lib/data/products.repo";
 import { applyFilters, parseFiltersFromSearchParams } from "@/lib/utils/filterProducts";
 import { sortProducts, type SortOption } from "@/lib/utils/sort";
 import { FilterSidebar } from "@/components/filters/FilterSidebar";
@@ -13,7 +13,7 @@ import { siteConfig } from "@/config/site";
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 
-export function CategoryPageContent({
+export async function CategoryPageContent({
   categorySlug,
   searchParams,
 }: {
@@ -23,7 +23,7 @@ export function CategoryPageContent({
   const category = getCategoryBySlug(categorySlug);
   if (!category) notFound();
 
-  const allProducts = getProductsByCategory(categorySlug);
+  const allProducts = await getProductsByCategoryAsync(categorySlug);
   const filters = parseFiltersFromSearchParams(searchParams);
   const filtered = applyFilters(allProducts, filters);
   const sort = (searchParams.sort as SortOption) ?? "recommended";

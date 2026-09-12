@@ -4,12 +4,14 @@ import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { ProductSection } from "@/components/home/ProductSection";
 import { FlashSale } from "@/components/home/FlashSale";
 import { FeaturedCollections } from "@/components/home/FeaturedCollections";
-import { getFeaturedProducts, getNewArrivals, getBestSellers } from "@/lib/data/products";
+import { getFeaturedProductsAsync, getNewArrivalsAsync, getBestSellersAsync } from "@/lib/data/products.repo";
 
-export default function HomePage() {
-  const featured = getFeaturedProducts();
-  const newArrivals = getNewArrivals();
-  const bestSellers = getBestSellers();
+export default async function HomePage() {
+  const [featured, newArrivals, bestSellers] = await Promise.all([
+    getFeaturedProductsAsync(),
+    getNewArrivalsAsync(),
+    getBestSellersAsync(),
+  ]);
 
   return (
     <>

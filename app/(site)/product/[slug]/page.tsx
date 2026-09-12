@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
-import { getAllProducts, getProductBySlug, getRelatedProducts } from "@/lib/data/products";
+import { getAllProductsAsync, getProductBySlugAsync, getRelatedProductsAsync } from "@/lib/data/products.repo";
 import { getCategoryBySlug } from "@/lib/data/categories";
 import { ProductDetailClient } from "@/components/product/ProductDetailClient";
 import { ProductTabs } from "@/components/product/ProductTabs";
@@ -11,13 +11,14 @@ import { RecentlyViewedSection } from "@/components/product/RecentlyViewedSectio
 import { RecordView } from "@/components/product/RecordView";
 import { siteConfig } from "@/config/site";
 
-export function generateStaticParams() {
-  return getAllProducts().map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  const products = await getAllProductsAsync();
+  return products.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlugAsync(slug);
   if (!product) return {};
 
   return {
@@ -34,11 +35,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlugAsync(slug);
   if (!product) notFound();
 
   const category = getCategoryBySlug(product.categorySlug);
-  const related = getRelatedProducts(product);
+  const related = await getRelatedProductsAsync(product);
 
   const jsonLd = {
     "@context": "https://schema.org",

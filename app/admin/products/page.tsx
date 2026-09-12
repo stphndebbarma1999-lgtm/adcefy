@@ -9,12 +9,26 @@ import { Button } from "@/components/ui/Button";
 import { getStockStatus, type ProductStatus, type StockStatus } from "@/types/product";
 
 export default function AdminProductsPage() {
-  const { products, categories, deleteProduct } = useAdminData();
+  const { products, productsLoading, categories, deleteProduct } = useAdminData();
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState<"all" | ProductStatus>("all");
   const [stockFilter, setStockFilter] = useState<"all" | StockStatus>("all");
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    try {
+      await deleteProduct(pendingDelete);
+      setPendingDelete(null);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete product.");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -82,24 +96,24 @@ export default function AdminProductsPage() {
         </select>
       </div>
 
-      <ProductTable products={filtered} onDelete={setPendingDelete} />
+      {productsLoading ? (
+        <div className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted">
+          Loading products...
+        </div>
+      ) : (
+        <ProductTable products={filtered} onDelete={setPendingDelete} />
+      )}
 
       <Modal open={Boolean(pendingDelete)} onClose={() => setPendingDelete(null)} title="Delete Product">
         <p className="mb-4 text-sm text-muted">
           Are you sure you want to delete this product? This action cannot be undone.
         </p>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setPendingDelete(null)}>
+          <Button variant="outline" onClick={() => setPendingDelete(null)} disabled={deleting}>
             Cancel
           </Button>
-          <Button
-            variant="danger"
-            onClick={() => {
-              if (pendingDelete) deleteProduct(pendingDelete);
-              setPendingDelete(null);
-            }}
-          >
-            Delete
+          <Button variant="danger" onClick={handleConfirmDelete} disabled={deleting}>
+            {deleting ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </Modal>

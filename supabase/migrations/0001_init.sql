@@ -1,62 +1,47 @@
 -- ADCEFY database schema.
 --
--- This is prepared architecture for when Supabase credentials are connected
--- (see lib/supabase/client.ts and lib/supabase/server.ts). It has not been
--- run against a live project. Review and apply with the Supabase CLI:
---   supabase db push
+-- Run this in the Supabase SQL Editor (or `supabase db push`) once per
+-- project. Row Level Security is enabled on every table: the anon key can
+-- only SELECT active/public rows; every write goes through server-side code
+-- using the service role key (see lib/supabase/admin.ts), gated by the
+-- ADMIN_PASSWORD session cookie (see middleware.ts) — never the anon key.
 --
--- Row Level Security (RLS) is enabled on every table. Public read policies
--- are provided for storefront browsing; all writes are expected to go
--- through server-side code (Server Actions / Route Handlers) using the
--- authenticated admin role — never the anon key for mutations.
+-- Categories, filters, coupons, banners and store settings are still
+-- code-driven (lib/data/*) as of this migration — only `products` is wired
+-- to this table so far. The other tables below are prepared for later
+-- phases and safe to leave unused.
 
 create extension if not exists "pgcrypto";
 
 -- ---------------------------------------------------------------------------
--- categories
--- ---------------------------------------------------------------------------
-create table if not exists categories (
-  id uuid primary key default gen_random_uuid(),
-  slug text unique not null,
-  name text not null,
-  description text,
-  image text,
-  icon text not null default 'LayoutGrid',
-  sort_order integer not null default 1,
-  is_active boolean not null default true,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists category_filters (
-  id uuid primary key default gen_random_uuid(),
-  category_id uuid not null references categories(id) on delete cascade,
-  filter_id text not null,
-  label text not null,
-  type text not null check (type in ('checkbox', 'range', 'toggle')),
-  options jsonb,
-  min_value numeric,
-  max_value numeric
-);
-
--- ---------------------------------------------------------------------------
 -- products
 -- ---------------------------------------------------------------------------
+-- Specifications, variants, images and tags are stored as JSON/array columns
+-- rather than normalized child tables — this keeps admin writes a single
+-- upsert instead of a multi-table transaction, which is the pragmatic choice
+-- for a catalog of this size. category_id/category_slug reference the
+-- static category list in lib/data/categories.ts (no FK — categories aren't
+-- in the database yet).
 create table if not exists products (
   id uuid primary key default gen_random_uuid(),
   slug text unique not null,
   name text not null,
   brand text not null,
-  category_id uuid not null references categories(id),
+  category_id text not null,
+  category_slug text not null,
   subcategory text,
-  short_description text,
-  description text,
+  short_description text not null default '',
+  description text not null default '',
   price numeric(12, 2) not null check (price >= 0),
   original_price numeric(12, 2),
-  stock integer not null default 0 check (stock >= 0),
-  sku text unique not null,
+  discount_percentage integer,
+  images text[] not null default '{}',
   rating numeric(2, 1) not null default 0,
   review_count integer not null default 0,
+  stock integer not null default 0 check (stock >= 0),
+  sku text unique not null,
+  specifications jsonb not null default '[]',
+  variants jsonb not null default '[]',
   tags text[] not null default '{}',
   is_featured boolean not null default false,
   is_new boolean not null default false,
@@ -66,51 +51,20 @@ create table if not exists products (
   updated_at timestamptz not null default now()
 );
 
-create index if not exists products_category_id_idx on products(category_id);
+create index if not exists products_category_slug_idx on products(category_slug);
 create index if not exists products_status_idx on products(status);
 create index if not exists products_slug_idx on products(slug);
 
--- Public image URLs only (e.g. Sirv) — never binary image data.
-create table if not exists product_images (
-  id uuid primary key default gen_random_uuid(),
-  product_id uuid not null references products(id) on delete cascade,
-  url text not null,
-  sort_order integer not null default 1
-);
+alter table products enable row level security;
 
-create index if not exists product_images_product_id_idx on product_images(product_id);
+create policy "Public can read active products" on products
+  for select using (status = 'active');
 
-create table if not exists product_specifications (
-  id uuid primary key default gen_random_uuid(),
-  product_id uuid not null references products(id) on delete cascade,
-  label text not null,
-  value text not null,
-  sort_order integer not null default 1
-);
-
-create index if not exists product_specifications_product_id_idx on product_specifications(product_id);
-
-create table if not exists product_variants (
-  id uuid primary key default gen_random_uuid(),
-  product_id uuid not null references products(id) on delete cascade,
-  name text not null,
-  sort_order integer not null default 1
-);
-
-create table if not exists product_variant_options (
-  id uuid primary key default gen_random_uuid(),
-  variant_id uuid not null references product_variants(id) on delete cascade,
-  name text not null,
-  price_adjustment numeric(12, 2) default 0,
-  stock integer,
-  sku text,
-  sort_order integer not null default 1
-);
-
-create index if not exists product_variant_options_variant_id_idx on product_variant_options(variant_id);
+-- No insert/update/delete policy for anon/authenticated — all writes go
+-- through /api/admin/products/* using the service role key.
 
 -- ---------------------------------------------------------------------------
--- customers & addresses
+-- customers & addresses (prepared for a later phase — not yet used by code)
 -- ---------------------------------------------------------------------------
 create table if not exists customers (
   id uuid primary key default gen_random_uuid(),
@@ -137,7 +91,7 @@ create table if not exists addresses (
 create index if not exists addresses_customer_id_idx on addresses(customer_id);
 
 -- ---------------------------------------------------------------------------
--- orders
+-- orders (prepared for a later phase — not yet used by code)
 -- ---------------------------------------------------------------------------
 create table if not exists orders (
   id uuid primary key default gen_random_uuid(),
@@ -179,7 +133,7 @@ create table if not exists order_items (
 create index if not exists order_items_order_id_idx on order_items(order_id);
 
 -- ---------------------------------------------------------------------------
--- coupons
+-- coupons (prepared for a later phase — not yet used by code)
 -- ---------------------------------------------------------------------------
 create table if not exists coupons (
   id uuid primary key default gen_random_uuid(),
@@ -196,7 +150,7 @@ create table if not exists coupons (
 );
 
 -- ---------------------------------------------------------------------------
--- banners
+-- banners (prepared for a later phase — not yet used by code)
 -- ---------------------------------------------------------------------------
 create table if not exists banners (
   id uuid primary key default gen_random_uuid(),
@@ -212,7 +166,7 @@ create table if not exists banners (
 );
 
 -- ---------------------------------------------------------------------------
--- store_settings (single row)
+-- store_settings (single row, prepared for a later phase — not yet used)
 -- ---------------------------------------------------------------------------
 create table if not exists store_settings (
   id integer primary key default 1 check (id = 1),
@@ -234,15 +188,8 @@ create table if not exists store_settings (
 );
 
 -- ---------------------------------------------------------------------------
--- Row Level Security
+-- Row Level Security for the not-yet-wired tables
 -- ---------------------------------------------------------------------------
-alter table categories enable row level security;
-alter table category_filters enable row level security;
-alter table products enable row level security;
-alter table product_images enable row level security;
-alter table product_specifications enable row level security;
-alter table product_variants enable row level security;
-alter table product_variant_options enable row level security;
 alter table customers enable row level security;
 alter table addresses enable row level security;
 alter table orders enable row level security;
@@ -251,18 +198,9 @@ alter table coupons enable row level security;
 alter table banners enable row level security;
 alter table store_settings enable row level security;
 
--- Public (anon) read access for storefront browsing.
-create policy "Public can read active categories" on categories for select using (is_active = true);
-create policy "Public can read category filters" on category_filters for select using (true);
-create policy "Public can read active products" on products for select using (status = 'active');
-create policy "Public can read product images" on product_images for select using (true);
-create policy "Public can read product specifications" on product_specifications for select using (true);
-create policy "Public can read product variants" on product_variants for select using (true);
-create policy "Public can read product variant options" on product_variant_options for select using (true);
 create policy "Public can read active banners" on banners for select using (is_active = true);
 create policy "Public can read store settings" on store_settings for select using (true);
 
--- Customers/addresses/orders: only the owning authenticated user may read their own rows.
 create policy "Customers can read their own record" on customers for select using (auth.uid() = auth_user_id);
 create policy "Customers can read their own addresses" on addresses for select using (
   exists (select 1 from customers c where c.id = addresses.customer_id and c.auth_user_id = auth.uid())
@@ -277,8 +215,3 @@ create policy "Customers can read their own order items" on order_items for sele
     where o.id = order_items.order_id and c.auth_user_id = auth.uid()
   )
 );
-
--- No public policies are defined for INSERT/UPDATE/DELETE on any table, and
--- none for coupons (validated server-side). All writes — including every
--- admin CRUD action in components/admin — must go through server-side code
--- running with an authenticated staff/admin role, never the browser anon key.
