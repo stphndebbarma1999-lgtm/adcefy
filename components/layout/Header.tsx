@@ -1,16 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Heart, Search, ShoppingCart, User } from "lucide-react";
+import { Heart, ShoppingCart, User } from "lucide-react";
 import { Logo } from "./Logo";
 import { AnnouncementBar } from "./AnnouncementBar";
-import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { useCart } from "@/lib/context/CartContext";
 import { useWishlist } from "@/lib/context/WishlistContext";
 
 export function Header() {
-  const [searchOpen, setSearchOpen] = useState(false);
   const { itemCount, openCart } = useCart();
   const { items: wishlistItems } = useWishlist();
 
@@ -22,13 +19,6 @@ export function Header() {
           <Logo imageClassName="h-12 w-auto sm:h-14 lg:h-16" />
 
           <div className="flex items-center gap-1 sm:gap-2">
-            <button
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-              className="rounded-lg p-2 text-ink hover:bg-surface-muted lg:hidden"
-            >
-              <Search size={22} />
-            </button>
             <Link href="/account" aria-label="Account" className="hidden rounded-lg p-2 text-ink hover:bg-surface-muted sm:block">
               <User size={22} />
             </Link>
@@ -51,8 +41,6 @@ export function Header() {
           </div>
         </div>
       </div>
-
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }
