@@ -5,6 +5,10 @@ import {
   Watch,
   Monitor,
   LayoutGrid,
+  Tablet,
+  Camera,
+  Gamepad2,
+  Speaker,
   type LucideProps,
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -16,6 +20,10 @@ const iconMap: Record<string, ComponentType<LucideProps>> = {
   Watch,
   Monitor,
   LayoutGrid,
+  Tablet,
+  Camera,
+  Gamepad2,
+  Speaker,
 };
 
 export function CategoryIcon({ name, ...props }: { name: string } & LucideProps) {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getCategoryBySlug } from "@/lib/data/categories";
+import { getCategoryBySlugAsync } from "@/lib/data/categories.repo";
 import { getProductsByCategoryAsync } from "@/lib/data/products.repo";
 import { applyFilters, parseFiltersFromSearchParams } from "@/lib/utils/filterProducts";
 import { sortProducts, type SortOption } from "@/lib/utils/sort";
@@ -20,7 +21,7 @@ export async function CategoryPageContent({
   categorySlug: string;
   searchParams: SearchParams;
 }) {
-  const category = getCategoryBySlug(categorySlug);
+  const category = await getCategoryBySlugAsync(categorySlug);
   if (!category) notFound();
 
   const allProducts = await getProductsByCategoryAsync(categorySlug);

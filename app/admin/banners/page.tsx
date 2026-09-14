@@ -14,17 +14,38 @@ const positionLabels: Record<Banner["position"], string> = {
   hero: "Hero",
   promo: "Promo",
   category: "Category",
+  carousel: "Homepage Carousel",
 };
 
 export default function AdminBannersPage() {
-  const { banners, addBanner, updateBanner, deleteBanner } = useAdminData();
+  const { banners, bannersLoading, addBanner, updateBanner, deleteBanner } = useAdminData();
   const [editing, setEditing] = useState<Banner | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<Banner | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const handleSubmit = (data: BannerFormData) => {
-    if (editing) updateBanner(editing.id, data);
-    else addBanner(data);
+  const handleSubmit = async (data: BannerFormData) => {
+    setError(null);
+    try {
+      if (editing) await updateBanner(editing.id, data);
+      else await addBanner(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save banner.");
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    try {
+      await deleteBanner(pendingDelete.id);
+      setPendingDelete(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete banner.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -44,6 +65,15 @@ export default function AdminBannersPage() {
         </Button>
       </div>
 
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-danger">{error}</div>
+      )}
+
+      {bannersLoading ? (
+        <div className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted">
+          Loading banners...
+        </div>
+      ) : (
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {banners.map((banner) => (
           <div key={banner.id} className="flex flex-col rounded-xl border border-border bg-white">
@@ -57,7 +87,15 @@ export default function AdminBannersPage() {
               <p className="text-sm font-semibold text-ink">{banner.title}</p>
               {banner.subtitle && <p className="line-clamp-2 text-xs text-muted">{banner.subtitle}</p>}
               <div className="mt-3 flex items-center justify-between">
-                <Toggle checked={banner.isActive} onChange={(v) => updateBanner(banner.id, { isActive: v })} label="Active" />
+                <Toggle
+                  checked={banner.isActive}
+                  onChange={(v) =>
+                    updateBanner(banner.id, { isActive: v }).catch((err) =>
+                      setError(err instanceof Error ? err.message : "Failed to update banner.")
+                    )
+                  }
+                  label="Active"
+                />
                 <div className="flex gap-1">
                   <button
                     onClick={() => {
@@ -82,23 +120,18 @@ export default function AdminBannersPage() {
           </div>
         ))}
       </div>
+      )}
 
       <BannerFormModal open={formOpen} onClose={() => setFormOpen(false)} initialBanner={editing ?? undefined} onSubmit={handleSubmit} />
 
       <Modal open={Boolean(pendingDelete)} onClose={() => setPendingDelete(null)} title="Delete Banner">
         <p className="mb-4 text-sm text-muted">Are you sure you want to delete &ldquo;{pendingDelete?.title}&rdquo;?</p>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setPendingDelete(null)}>
+          <Button variant="outline" onClick={() => setPendingDelete(null)} disabled={deleting}>
             Cancel
           </Button>
-          <Button
-            variant="danger"
-            onClick={() => {
-              if (pendingDelete) deleteBanner(pendingDelete.id);
-              setPendingDelete(null);
-            }}
-          >
-            Delete
+          <Button variant="danger" onClick={handleConfirmDelete} disabled={deleting}>
+            {deleting ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </Modal>

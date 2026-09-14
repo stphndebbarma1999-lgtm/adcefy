@@ -27,7 +27,7 @@ export function BannerFormModal({
   const [mobileImage, setMobileImage] = useState(initialBanner?.mobileImage ?? "");
   const [buttonText, setButtonText] = useState(initialBanner?.buttonText ?? "");
   const [buttonUrl, setButtonUrl] = useState(initialBanner?.buttonUrl ?? "");
-  const [position, setPosition] = useState<BannerPosition>(initialBanner?.position ?? "promo");
+  const [position, setPosition] = useState<BannerPosition>(initialBanner?.position ?? "carousel");
   const [sortOrder, setSortOrder] = useState(String(initialBanner?.sortOrder ?? 1));
   const [isActive, setIsActive] = useState(initialBanner?.isActive ?? true);
   const [error, setError] = useState("");
@@ -66,6 +66,7 @@ export function BannerFormModal({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Select label="Position" value={position} onChange={(e) => setPosition(e.target.value as BannerPosition)}>
+            <option value="carousel">Homepage Carousel</option>
             <option value="hero">Hero</option>
             <option value="promo">Promo</option>
             <option value="category">Category</option>

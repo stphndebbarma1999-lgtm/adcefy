@@ -12,14 +12,34 @@ import { CategoryFormModal, type CategoryFormData } from "@/components/admin/Cat
 import type { Category } from "@/types/category";
 
 export default function AdminCategoriesPage() {
-  const { categories, products, addCategory, updateCategory, deleteCategory } = useAdminData();
+  const { categories, categoriesLoading, products, addCategory, updateCategory, deleteCategory } = useAdminData();
   const [editing, setEditing] = useState<Category | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<Category | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const handleSubmit = (data: CategoryFormData) => {
-    if (editing) updateCategory(editing.id, data);
-    else addCategory({ ...data, filters: [] });
+  const handleSubmit = async (data: CategoryFormData) => {
+    setError(null);
+    try {
+      if (editing) await updateCategory(editing.id, data);
+      else await addCategory({ ...data, filters: [] });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save category.");
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    try {
+      await deleteCategory(pendingDelete.id);
+      setPendingDelete(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete category.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -39,6 +59,15 @@ export default function AdminCategoriesPage() {
         </Button>
       </div>
 
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-danger">{error}</div>
+      )}
+
+      {categoriesLoading ? (
+        <div className="rounded-xl border border-dashed border-border py-16 text-center text-sm text-muted">
+          Loading categories...
+        </div>
+      ) : (
       <Table>
         <Thead>
           <Tr>
@@ -92,6 +121,7 @@ export default function AdminCategoriesPage() {
           ))}
         </Tbody>
       </Table>
+      )}
 
       <CategoryFormModal
         open={formOpen}
@@ -106,17 +136,11 @@ export default function AdminCategoriesPage() {
           but the category link will no longer appear in navigation.
         </p>
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={() => setPendingDelete(null)}>
+          <Button variant="outline" onClick={() => setPendingDelete(null)} disabled={deleting}>
             Cancel
           </Button>
-          <Button
-            variant="danger"
-            onClick={() => {
-              if (pendingDelete) deleteCategory(pendingDelete.id);
-              setPendingDelete(null);
-            }}
-          >
-            Delete
+          <Button variant="danger" onClick={handleConfirmDelete} disabled={deleting}>
+            {deleting ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </Modal>

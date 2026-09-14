@@ -1,4 +1,4 @@
-export type BannerPosition = "hero" | "promo" | "category";
+export type BannerPosition = "hero" | "promo" | "category" | "carousel";
 
 export interface Banner {
   id: string;

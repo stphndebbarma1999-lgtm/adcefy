@@ -3,15 +3,13 @@
 /**
  * Admin working data store.
  *
- * This is a browser-persisted (localStorage) demo data layer that powers the
- * ADCEFY Admin UI end-to-end (add / edit / delete) without a backend. It is
- * seeded from lib/data on first load.
+ * Products, categories and banners are backed by Supabase (see
+ * app/api/admin/products|categories|banners) — fetched on mount and kept in
+ * sync via the CRUD calls below, so edits show up on the live storefront.
  *
- * IMPORTANT — this does NOT sync to the public storefront, which renders
- * from lib/data on the server for performance/SEO. Once Supabase is
- * connected (see lib/supabase), swap the methods below for real database
- * reads/writes (e.g. Server Actions backed by Supabase with RLS) and the
- * storefront + admin will share one live source of truth.
+ * Orders, customers, coupons and settings are still a browser-persisted
+ * (localStorage) demo layer, seeded from lib/data. Once those move to
+ * Supabase too, swap their methods below for the same fetch-based pattern.
  */
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
@@ -23,31 +21,25 @@ import type { Coupon } from "@/types/coupon";
 import type { Banner } from "@/types/banner";
 import type { StoreSettings } from "@/types/settings";
 
-import { categories as demoCategories } from "@/lib/data/categories";
 import { orders as demoOrders } from "@/lib/data/orders";
 import { customers as demoCustomers } from "@/lib/data/customers";
 import { coupons as demoCoupons } from "@/lib/data/coupons";
-import { banners as demoBanners } from "@/lib/data/banners";
 import { defaultSettings } from "@/lib/data/settings";
 
 const STORAGE_KEY = "adcefy_admin_store_v1";
 
 interface AdminState {
-  categories: Category[];
   orders: Order[];
   customers: Customer[];
   coupons: Coupon[];
-  banners: Banner[];
   settings: StoreSettings;
 }
 
 function seedState(): AdminState {
   return {
-    categories: demoCategories,
     orders: demoOrders,
     customers: demoCustomers,
     coupons: demoCoupons,
-    banners: demoBanners,
     settings: defaultSettings,
   };
 }
@@ -67,16 +59,20 @@ interface AdminDataContextValue extends AdminState {
   addProduct: (product: Omit<Product, "id" | "createdAt" | "updatedAt">) => Promise<Product>;
   updateProduct: (id: string, product: Partial<Product>) => Promise<Product>;
   deleteProduct: (id: string) => Promise<void>;
-  addCategory: (category: Omit<Category, "id">) => Category;
-  updateCategory: (id: string, category: Partial<Category>) => void;
-  deleteCategory: (id: string) => void;
+  categories: Category[];
+  categoriesLoading: boolean;
+  addCategory: (category: Omit<Category, "id">) => Promise<Category>;
+  updateCategory: (id: string, category: Partial<Category>) => Promise<Category>;
+  deleteCategory: (id: string) => Promise<void>;
   updateOrderStatus: (id: string, status: OrderStatus) => void;
   addCoupon: (coupon: Omit<Coupon, "id" | "usedCount">) => Coupon;
   updateCoupon: (id: string, coupon: Partial<Coupon>) => void;
   deleteCoupon: (id: string) => void;
-  addBanner: (banner: Omit<Banner, "id">) => Banner;
-  updateBanner: (id: string, banner: Partial<Banner>) => void;
-  deleteBanner: (id: string) => void;
+  banners: Banner[];
+  bannersLoading: boolean;
+  addBanner: (banner: Omit<Banner, "id">) => Promise<Banner>;
+  updateBanner: (id: string, banner: Partial<Banner>) => Promise<Banner>;
+  deleteBanner: (id: string) => Promise<void>;
   updateSettings: (settings: Partial<StoreSettings>) => void;
   adjustStock: (productId: string, stock: number) => Promise<void>;
   resetDemoData: () => void;
@@ -90,16 +86,61 @@ async function readJsonOrThrow(res: Response) {
   return data;
 }
 
+/** Fetches a Supabase-backed admin collection once on mount. */
+function useAdminCollection<T>(endpoint: string, key: string) {
+  const [items, setItems] = useState<T[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [live, setLive] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(endpoint);
+        const data = await readJsonOrThrow(res);
+        if (!cancelled) {
+          setItems(data[key]);
+          setLive(true);
+        }
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : `Failed to load ${key}.`);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return { items, setItems, loading, live, error };
+}
+
 export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AdminState>(seedState);
   const [hydrated, setHydrated] = useState(false);
 
-  // Products live in Supabase (see app/api/admin/products), not localStorage —
-  // fetched once on mount and kept in sync via the CRUD calls below.
-  const [products, setProducts] = useState<Product[]>([]);
-  const [productsLoading, setProductsLoading] = useState(true);
-  const [productsLive, setProductsLive] = useState(false);
-  const [productsError, setProductsError] = useState<string | null>(null);
+  const {
+    items: products,
+    setItems: setProducts,
+    loading: productsLoading,
+    live: productsLive,
+    error: productsError,
+  } = useAdminCollection<Product>("/api/admin/products", "products");
+
+  const {
+    items: categories,
+    setItems: setCategories,
+    loading: categoriesLoading,
+  } = useAdminCollection<Category>("/api/admin/categories", "categories");
+
+  const {
+    items: banners,
+    setItems: setBanners,
+    loading: bannersLoading,
+  } = useAdminCollection<Banner>("/api/admin/banners", "banners");
 
   useEffect(() => {
     // One-time hydration from localStorage on mount — see CartContext for rationale.
@@ -123,27 +164,6 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     }
   }, [state, hydrated]);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/admin/products");
-        const data = await readJsonOrThrow(res);
-        if (!cancelled) {
-          setProducts(data.products);
-          setProductsLive(true);
-        }
-      } catch (err) {
-        if (!cancelled) setProductsError(err instanceof Error ? err.message : "Failed to load products.");
-      } finally {
-        if (!cancelled) setProductsLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   const addProduct = useCallback(async (product: Omit<Product, "id" | "createdAt" | "updatedAt">) => {
     const res = await fetch("/api/admin/products", {
       method: "POST",
@@ -153,7 +173,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     const data = await readJsonOrThrow(res);
     setProducts((prev) => [data.product, ...prev]);
     return data.product as Product;
-  }, []);
+  }, [setProducts]);
 
   const updateProduct = useCallback(async (id: string, product: Partial<Product>) => {
     const res = await fetch(`/api/admin/products/${id}`, {
@@ -164,30 +184,41 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     const data = await readJsonOrThrow(res);
     setProducts((prev) => prev.map((p) => (p.id === id ? data.product : p)));
     return data.product as Product;
-  }, []);
+  }, [setProducts]);
 
   const deleteProduct = useCallback(async (id: string) => {
     const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
     await readJsonOrThrow(res);
     setProducts((prev) => prev.filter((p) => p.id !== id));
-  }, []);
+  }, [setProducts]);
 
-  const addCategory = useCallback((category: Omit<Category, "id">) => {
-    const newCategory: Category = { ...category, id: generateId("cat") };
-    setState((prev) => ({ ...prev, categories: [...prev.categories, newCategory] }));
-    return newCategory;
-  }, []);
+  const addCategory = useCallback(async (category: Omit<Category, "id">) => {
+    const res = await fetch("/api/admin/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(category),
+    });
+    const data = await readJsonOrThrow(res);
+    setCategories((prev) => [...prev, data.category].sort((a, b) => a.sortOrder - b.sortOrder));
+    return data.category as Category;
+  }, [setCategories]);
 
-  const updateCategory = useCallback((id: string, category: Partial<Category>) => {
-    setState((prev) => ({
-      ...prev,
-      categories: prev.categories.map((c) => (c.id === id ? { ...c, ...category } : c)),
-    }));
-  }, []);
+  const updateCategory = useCallback(async (id: string, category: Partial<Category>) => {
+    const res = await fetch(`/api/admin/categories/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(category),
+    });
+    const data = await readJsonOrThrow(res);
+    setCategories((prev) => prev.map((c) => (c.id === id ? data.category : c)).sort((a, b) => a.sortOrder - b.sortOrder));
+    return data.category as Category;
+  }, [setCategories]);
 
-  const deleteCategory = useCallback((id: string) => {
-    setState((prev) => ({ ...prev, categories: prev.categories.filter((c) => c.id !== id) }));
-  }, []);
+  const deleteCategory = useCallback(async (id: string) => {
+    const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
+    await readJsonOrThrow(res);
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+  }, [setCategories]);
 
   const updateOrderStatus = useCallback((id: string, status: OrderStatus) => {
     setState((prev) => ({
@@ -210,19 +241,33 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, coupons: prev.coupons.filter((c) => c.id !== id) }));
   }, []);
 
-  const addBanner = useCallback((banner: Omit<Banner, "id">) => {
-    const newBanner: Banner = { ...banner, id: generateId("ban") };
-    setState((prev) => ({ ...prev, banners: [...prev.banners, newBanner] }));
-    return newBanner;
-  }, []);
+  const addBanner = useCallback(async (banner: Omit<Banner, "id">) => {
+    const res = await fetch("/api/admin/banners", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(banner),
+    });
+    const data = await readJsonOrThrow(res);
+    setBanners((prev) => [...prev, data.banner].sort((a, b) => a.sortOrder - b.sortOrder));
+    return data.banner as Banner;
+  }, [setBanners]);
 
-  const updateBanner = useCallback((id: string, banner: Partial<Banner>) => {
-    setState((prev) => ({ ...prev, banners: prev.banners.map((b) => (b.id === id ? { ...b, ...banner } : b)) }));
-  }, []);
+  const updateBanner = useCallback(async (id: string, banner: Partial<Banner>) => {
+    const res = await fetch(`/api/admin/banners/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(banner),
+    });
+    const data = await readJsonOrThrow(res);
+    setBanners((prev) => prev.map((b) => (b.id === id ? data.banner : b)).sort((a, b) => a.sortOrder - b.sortOrder));
+    return data.banner as Banner;
+  }, [setBanners]);
 
-  const deleteBanner = useCallback((id: string) => {
-    setState((prev) => ({ ...prev, banners: prev.banners.filter((b) => b.id !== id) }));
-  }, []);
+  const deleteBanner = useCallback(async (id: string) => {
+    const res = await fetch(`/api/admin/banners/${id}`, { method: "DELETE" });
+    await readJsonOrThrow(res);
+    setBanners((prev) => prev.filter((b) => b.id !== id));
+  }, [setBanners]);
 
   const updateSettings = useCallback((settings: Partial<StoreSettings>) => {
     setState((prev) => ({ ...prev, settings: { ...prev.settings, ...settings } }));
@@ -249,6 +294,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     addProduct,
     updateProduct,
     deleteProduct,
+    categories,
+    categoriesLoading,
     addCategory,
     updateCategory,
     deleteCategory,
@@ -256,6 +303,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     addCoupon,
     updateCoupon,
     deleteCoupon,
+    banners,
+    bannersLoading,
     addBanner,
     updateBanner,
     deleteBanner,
