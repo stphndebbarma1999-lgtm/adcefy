@@ -24,8 +24,8 @@ export const siteConfig = {
 
   contact: {
     supportEmail: "contact@adcefy.com",
-    supportPhone: "",
-    whatsapp: "",
+    supportPhone: "+91 7005212711",
+    whatsapp: "+91 9366026432",
     address: "Mandwi Bazaar, Mandwi Composite Market, Room No. 73, First Floor, West Tripura, 799045",
     businessHours: "Mon–Sat, 9:00 AM – 7:00 PM IST",
   },

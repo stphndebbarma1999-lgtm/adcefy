@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <main className="flex-1 pb-16 sm:pb-0">{children}</main>
       <Footer />
       <MobileBottomNav />
+      <WhatsAppButton />
     </>
   );
 }

@@ -9,7 +9,7 @@ export async function CategoryShowcase() {
   return (
     <section className="py-8">
       <h2 className="container-page mb-4 text-lg font-bold uppercase tracking-wide text-ink">Categories</h2>
-      <div className="container-page grid auto-cols-[4rem] grid-flow-col grid-rows-2 gap-x-4 gap-y-3 overflow-x-auto pb-2 sm:auto-cols-[5rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="container-page flex flex-wrap justify-center gap-x-4 gap-y-4">
         {categories.map((category) => (
           <Link key={category.id} href={`/${category.slug}`} className="group flex w-16 shrink-0 flex-col items-center gap-1.5 sm:w-20">
             <div className="relative aspect-square w-16 overflow-hidden rounded-full bg-surface-muted sm:w-20">

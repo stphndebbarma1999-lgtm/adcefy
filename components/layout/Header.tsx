@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Heart, Search, ShoppingCart, User } from "lucide-react";
 import { Logo } from "./Logo";
@@ -9,14 +8,8 @@ import { AnnouncementBar } from "./AnnouncementBar";
 import { SearchOverlay } from "@/components/search/SearchOverlay";
 import { useCart } from "@/lib/context/CartContext";
 import { useWishlist } from "@/lib/context/WishlistContext";
-import { getCategories } from "@/lib/data/categories";
-import { cn } from "@/lib/utils/cn";
-
-const categories = getCategories();
-const navItems = [{ slug: "", name: "Home" }, ...categories.map((c) => ({ slug: c.slug, name: c.name }))];
 
 export function Header() {
-  const pathname = usePathname();
   const [searchOpen, setSearchOpen] = useState(false);
   const { itemCount, openCart } = useCart();
   const { items: wishlistItems } = useWishlist();
@@ -27,35 +20,6 @@ export function Header() {
       <div className="border-b border-border">
         <div className="container-page flex h-20 items-center justify-between gap-4 lg:h-24">
           <Logo imageClassName="h-12 w-auto sm:h-14 lg:h-16" />
-
-          <nav className="hidden items-center gap-6 lg:flex" aria-label="Main navigation">
-            {navItems.map((item) => {
-              const href = `/${item.slug}`;
-              const active = pathname === href;
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-primary",
-                    active ? "text-primary" : "text-ink"
-                  )}
-                >
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="hidden max-w-xs flex-1 items-center lg:flex">
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="flex h-10 w-full items-center gap-2 rounded-lg border border-border bg-surface-muted px-3.5 text-sm text-muted hover:border-primary/40"
-            >
-              <Search size={16} />
-              Search for products...
-            </button>
-          </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
             <button
