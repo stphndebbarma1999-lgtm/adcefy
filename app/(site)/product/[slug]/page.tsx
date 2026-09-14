@@ -11,6 +11,10 @@ import { RecentlyViewedSection } from "@/components/product/RecentlyViewedSectio
 import { RecordView } from "@/components/product/RecordView";
 import { siteConfig } from "@/config/site";
 
+// Prerendered slugs would otherwise freeze at build-time content forever —
+// this lets edits (price, stock, description) show up within a minute.
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   const products = await getAllProductsAsync();
   return products.map((p) => ({ slug: p.slug }));

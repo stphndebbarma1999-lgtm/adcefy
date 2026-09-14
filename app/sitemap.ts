@@ -3,6 +3,8 @@ import { siteConfig } from "@/config/site";
 import { getCategories } from "@/lib/data/categories";
 import { getAllProductsAsync } from "@/lib/data/products.repo";
 
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     "",
