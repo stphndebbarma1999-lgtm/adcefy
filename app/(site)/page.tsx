@@ -1,5 +1,6 @@
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { CategoryShowcase } from "@/components/home/CategoryShowcase";
+import { NewArrivals } from "@/components/home/NewArrivals";
 
 // Without this, the homepage uses no dynamic APIs (no cookies/headers/searchParams),
 // so Next prerenders it once at build time and freezes that HTML forever — a
@@ -12,6 +13,7 @@ export default function HomePage() {
     <>
       <HeroCarousel />
       <CategoryShowcase />
+      <NewArrivals />
     </>
   );
 }

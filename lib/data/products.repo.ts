@@ -133,6 +133,11 @@ export async function getProductsByCategoryAsync(categorySlug: string): Promise<
   return all.filter((p) => p.categorySlug === categorySlug);
 }
 
+export async function getNewArrivalsAsync(limit = 8): Promise<Product[]> {
+  const all = await getAllProductsAsync();
+  return all.filter((p) => p.isNew).slice(0, limit);
+}
+
 export async function getRelatedProductsAsync(product: Product, limit = 4): Promise<Product[]> {
   const all = await getAllProductsAsync();
   return all.filter((p) => p.categorySlug === product.categorySlug && p.id !== product.id).slice(0, limit);
