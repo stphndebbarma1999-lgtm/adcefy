@@ -18,7 +18,7 @@ export const siteConfig = {
 
   logo: {
     // Configurable logo URL. Empty string falls back to the text wordmark.
-    url: "",
+    url: "/logo.png",
     faviconUrl: "/favicon.ico",
   },
 
