@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     q: "How do I contact customer support?",
-    a: `Reach us at ${siteConfig.contact.supportEmail} or ${siteConfig.contact.supportPhone}, ${siteConfig.contact.businessHours}.`,
+    a: `Reach us at ${siteConfig.contact.supportEmail}, ${siteConfig.contact.businessHours}.`,
   },
 ];
 

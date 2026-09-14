@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Camera, Mail, MapPin, Phone, Users, PlaySquare } from "lucide-react";
+import { Camera, Mail, MapPin, Users, PlaySquare } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { getCategories } from "@/lib/data/categories";
 import { Logo } from "./Logo";
@@ -111,10 +111,6 @@ export function Footer() {
             <li className="flex items-start gap-2 text-sm text-muted">
               <MapPin size={16} className="mt-0.5 shrink-0" />
               {siteConfig.contact.address}
-            </li>
-            <li className="flex items-center gap-2 text-sm text-muted">
-              <Phone size={16} className="shrink-0" />
-              {siteConfig.contact.supportPhone}
             </li>
             <li className="flex items-center gap-2 text-sm text-muted">
               <Mail size={16} className="shrink-0" />

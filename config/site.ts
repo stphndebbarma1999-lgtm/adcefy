@@ -23,10 +23,10 @@ export const siteConfig = {
   },
 
   contact: {
-    supportEmail: "support@adcefy.com",
-    supportPhone: "+91 98765 43210",
-    whatsapp: "+91 98765 43210",
-    address: "ADCEFY Technologies, 4th Floor, Cyber Towers, HITEC City, Hyderabad, Telangana 500081, India",
+    supportEmail: "contact@adcefy.com",
+    supportPhone: "",
+    whatsapp: "",
+    address: "Mandwi Bazaar, Mandwi Composite Market, Room No. 73, First Floor, West Tripura, 799045",
     businessHours: "Mon–Sat, 9:00 AM – 7:00 PM IST",
   },
 
