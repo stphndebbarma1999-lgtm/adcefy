@@ -25,9 +25,7 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-white">
       <AnnouncementBar />
       <div className="border-b border-border">
-        <div className="container-page flex h-16 items-center justify-between gap-4 lg:h-20">
-          <Logo />
-
+        <div className="container-page relative flex h-20 items-center justify-between gap-4 lg:h-24">
           <nav className="hidden items-center gap-6 lg:flex" aria-label="Main navigation">
             {navItems.map((item) => {
               const href = `/${item.slug}`;
@@ -47,7 +45,9 @@ export function Header() {
             })}
           </nav>
 
-          <div className="hidden flex-1 max-w-sm items-center lg:flex">
+          <Logo className="absolute left-1/2 -translate-x-1/2" imageClassName="h-12 w-auto sm:h-14 lg:h-16" />
+
+          <div className="ml-auto hidden max-w-xs flex-1 items-center lg:flex">
             <button
               onClick={() => setSearchOpen(true)}
               className="flex h-10 w-full items-center gap-2 rounded-lg border border-border bg-surface-muted px-3.5 text-sm text-muted hover:border-primary/40"
@@ -57,7 +57,7 @@ export function Header() {
             </button>
           </div>
 
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="ml-auto flex items-center gap-1 sm:gap-2 lg:ml-0">
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Search"

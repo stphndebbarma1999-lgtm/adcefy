@@ -3,7 +3,7 @@ import Image from "next/image";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils/cn";
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, imageClassName }: { className?: string; imageClassName?: string }) {
   return (
     <Link href="/" className={cn("flex items-center gap-2 shrink-0", className)}>
       {siteConfig.logo.url ? (
@@ -15,7 +15,7 @@ export function Logo({ className }: { className?: string }) {
           width={220}
           height={98}
           priority
-          className="h-8 w-auto sm:h-9"
+          className={imageClassName ?? "h-8 w-auto sm:h-9"}
         />
       ) : (
         <>
