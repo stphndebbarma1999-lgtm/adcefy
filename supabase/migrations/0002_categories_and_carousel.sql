@@ -49,6 +49,14 @@ insert into categories (slug, name, description, icon, sort_order, is_active) va
   ('speakers', 'Speakers', 'Portable and home speakers for every occasion.', 'Speaker', 11, true)
 on conflict (slug) do nothing;
 
+-- ---------------------------------------------------------------------------
+-- banners: allow the new "carousel" position used by the homepage
+-- (must happen before the insert below, which uses position = 'carousel')
+-- ---------------------------------------------------------------------------
+alter table banners drop constraint if exists banners_position_check;
+alter table banners add constraint banners_position_check
+  check (position in ('hero', 'promo', 'category', 'carousel'));
+
 -- Seed 6 empty homepage carousel slots (admin fills in real images later).
 insert into banners (title, desktop_image, button_url, position, sort_order, is_active) values
   ('Latest Technology, Better Prices', '', '/mobile', 'carousel', 1, false),
@@ -57,10 +65,3 @@ insert into banners (title, desktop_image, button_url, position, sort_order, is_
   ('Gadgets & Wearables', '', '/gadgets', 'carousel', 4, false),
   ('Computer Accessories', '', '/computer', 'carousel', 5, false),
   ('Audio & Sound', '', '/headphones-earbuds', 'carousel', 6, false);
-
--- ---------------------------------------------------------------------------
--- banners: allow the new "carousel" position used by the homepage
--- ---------------------------------------------------------------------------
-alter table banners drop constraint if exists banners_position_check;
-alter table banners add constraint banners_position_check
-  check (position in ('hero', 'promo', 'category', 'carousel'));
