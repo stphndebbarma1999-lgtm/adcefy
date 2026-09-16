@@ -18,7 +18,7 @@ const positionLabels: Record<Banner["position"], string> = {
 };
 
 export default function AdminBannersPage() {
-  const { banners, bannersLoading, addBanner, updateBanner, deleteBanner } = useAdminData();
+  const { banners, bannersLoading, categories, addBanner, updateBanner, deleteBanner } = useAdminData();
   const [editing, setEditing] = useState<Banner | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<Banner | null>(null);
@@ -86,6 +86,12 @@ export default function AdminBannersPage() {
             <div className="flex flex-1 flex-col gap-1 p-4">
               <p className="text-sm font-semibold text-ink">{banner.title}</p>
               {banner.subtitle && <p className="line-clamp-2 text-xs text-muted">{banner.subtitle}</p>}
+              <p className="text-xs text-muted">
+                Linked Category:{" "}
+                <span className="font-medium text-ink">
+                  {categories.find((c) => c.id === banner.categoryId)?.name ?? "None"}
+                </span>
+              </p>
               <div className="mt-3 flex items-center justify-between">
                 <Toggle
                   checked={banner.isActive}
@@ -122,7 +128,13 @@ export default function AdminBannersPage() {
       </div>
       )}
 
-      <BannerFormModal open={formOpen} onClose={() => setFormOpen(false)} initialBanner={editing ?? undefined} onSubmit={handleSubmit} />
+      <BannerFormModal
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        initialBanner={editing ?? undefined}
+        categories={categories}
+        onSubmit={handleSubmit}
+      />
 
       <Modal open={Boolean(pendingDelete)} onClose={() => setPendingDelete(null)} title="Delete Banner">
         <p className="mb-4 text-sm text-muted">Are you sure you want to delete &ldquo;{pendingDelete?.title}&rdquo;?</p>

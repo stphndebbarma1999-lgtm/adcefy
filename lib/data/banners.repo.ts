@@ -15,6 +15,7 @@ export interface BannerRow {
   mobile_image: string | null;
   button_text: string | null;
   button_url: string | null;
+  category_id: string | null;
   position: BannerPosition;
   sort_order: number;
   is_active: boolean;
@@ -29,6 +30,7 @@ export function mapRowToBanner(row: BannerRow): Banner {
     mobileImage: row.mobile_image ?? undefined,
     buttonText: row.button_text ?? undefined,
     buttonUrl: row.button_url ?? undefined,
+    categoryId: row.category_id ?? undefined,
     position: row.position,
     sortOrder: row.sort_order,
     isActive: row.is_active,
@@ -44,10 +46,26 @@ export function mapBannerInputToRow(input: Partial<Omit<Banner, "id">>) {
   if (input.mobileImage !== undefined) row.mobile_image = input.mobileImage || null;
   if (input.buttonText !== undefined) row.button_text = input.buttonText || null;
   if (input.buttonUrl !== undefined) row.button_url = input.buttonUrl || null;
+  if (input.categoryId !== undefined) row.category_id = input.categoryId || null;
   if (input.position !== undefined) row.position = input.position;
   if (input.sortOrder !== undefined) row.sort_order = input.sortOrder;
   if (input.isActive !== undefined) row.is_active = input.isActive;
   return row;
+}
+
+/** Attaches categorySlug (resolved from categoryId) to each banner, for linking. */
+async function resolveCategorySlugs(bannersList: Banner[]): Promise<Banner[]> {
+  const ids = [...new Set(bannersList.map((b) => b.categoryId).filter((id): id is string => Boolean(id)))];
+  if (ids.length === 0) return bannersList;
+
+  const supabase = createPublicClient();
+  if (!supabase) return bannersList;
+
+  const { data } = await supabase.from("categories").select("id, slug").in("id", ids);
+  if (!data) return bannersList;
+
+  const slugById = new Map((data as { id: string; slug: string }[]).map((c) => [c.id, c.slug]));
+  return bannersList.map((b) => (b.categoryId ? { ...b, categorySlug: slugById.get(b.categoryId) } : b));
 }
 
 export async function getActiveBannersAsync(position?: BannerPosition): Promise<Banner[]> {
@@ -56,7 +74,7 @@ export async function getActiveBannersAsync(position?: BannerPosition): Promise<
     let query = supabase.from("banners").select("*").eq("is_active", true).order("sort_order", { ascending: true });
     if (position) query = query.eq("position", position);
     const { data, error } = await query;
-    if (!error && data) return (data as BannerRow[]).map(mapRowToBanner);
+    if (!error && data) return resolveCategorySlugs((data as BannerRow[]).map(mapRowToBanner));
   }
   return getDemoActiveBanners(position);
 }

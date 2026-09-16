@@ -7,18 +7,21 @@ export async function CategoryShowcase() {
   if (categories.length === 0) return null;
 
   return (
-    <section className="py-8">
-      <h2 className="container-page mb-4 text-lg font-bold uppercase tracking-wide text-ink">Categories</h2>
-      <div className="container-page flex flex-wrap justify-center gap-x-4 gap-y-4">
+    <section className="py-4">
+      <div className="container-page flex gap-x-3 overflow-x-auto scroll-smooth [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {categories.map((category) => (
-          <Link key={category.id} href={`/${category.slug}`} className="group flex w-16 shrink-0 flex-col items-center gap-1.5 sm:w-20">
-            <div className="relative aspect-square w-16 overflow-hidden rounded-full bg-surface-muted sm:w-20">
+          <Link
+            key={category.id}
+            href={`/${category.slug}`}
+            className="group flex w-14 shrink-0 flex-col items-center gap-1.5 sm:w-16"
+          >
+            <div className="relative aspect-square w-14 overflow-hidden rounded-full bg-surface-muted sm:w-16">
               <ProductImage
                 src={category.image}
                 alt={category.name}
                 categorySlug={category.slug}
                 fill
-                sizes="80px"
+                sizes="64px"
                 className="transition-transform duration-300 group-hover:scale-105"
               />
             </div>

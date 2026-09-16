@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Banner, BannerPosition } from "@/types/banner";
+import type { Category } from "@/types/category";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Toggle } from "@/components/ui/Toggle";
@@ -14,11 +15,13 @@ export function BannerFormModal({
   open,
   onClose,
   initialBanner,
+  categories,
   onSubmit,
 }: {
   open: boolean;
   onClose: () => void;
   initialBanner?: Banner;
+  categories: Category[];
   onSubmit: (data: BannerFormData) => void;
 }) {
   const [title, setTitle] = useState(initialBanner?.title ?? "");
@@ -27,6 +30,7 @@ export function BannerFormModal({
   const [mobileImage, setMobileImage] = useState(initialBanner?.mobileImage ?? "");
   const [buttonText, setButtonText] = useState(initialBanner?.buttonText ?? "");
   const [buttonUrl, setButtonUrl] = useState(initialBanner?.buttonUrl ?? "");
+  const [categoryId, setCategoryId] = useState(initialBanner?.categoryId ?? "");
   const [position, setPosition] = useState<BannerPosition>(initialBanner?.position ?? "carousel");
   const [sortOrder, setSortOrder] = useState(String(initialBanner?.sortOrder ?? 1));
   const [isActive, setIsActive] = useState(initialBanner?.isActive ?? true);
@@ -46,6 +50,7 @@ export function BannerFormModal({
       mobileImage: mobileImage.trim() || undefined,
       buttonText: buttonText.trim() || undefined,
       buttonUrl: buttonUrl.trim() || undefined,
+      categoryId: categoryId || undefined,
       position,
       sortOrder: Number(sortOrder) || 1,
       isActive,
@@ -64,6 +69,14 @@ export function BannerFormModal({
           <Input label="Button Text" value={buttonText} onChange={(e) => setButtonText(e.target.value)} />
           <Input label="Button URL" value={buttonUrl} onChange={(e) => setButtonUrl(e.target.value)} />
         </div>
+        <Select label="Linked Category" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+          <option value="">None</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </Select>
         <div className="grid grid-cols-2 gap-4">
           <Select label="Position" value={position} onChange={(e) => setPosition(e.target.value as BannerPosition)}>
             <option value="carousel">Homepage Carousel</option>

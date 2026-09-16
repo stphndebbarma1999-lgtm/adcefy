@@ -49,8 +49,8 @@ export function HeroCarouselClient({ slides }: { slides: Banner[] }) {
 
           return (
             <div key={slide.id} ref={(el) => { slideRefs.current[index] = el; }} className="w-full flex-none snap-center">
-              {slide.buttonUrl ? (
-                <Link href={slide.buttonUrl} className="block" aria-label={slide.title}>
+              {slide.categorySlug ? (
+                <Link href={`/${slide.categorySlug}`} className="block" aria-label={slide.title}>
                   {content}
                 </Link>
               ) : (
