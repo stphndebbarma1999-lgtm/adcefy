@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MapPin, Heart, Package, LogOut, User } from "lucide-react";
-import { getCustomers } from "@/lib/data/customers";
-import { formatDate } from "@/lib/utils/format";
+import { MapPin, Heart, Package, User } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 export const metadata: Metadata = {
   title: "My Account",
@@ -13,31 +12,23 @@ const links = [
   { href: "/account/orders", label: "My Orders", icon: Package, description: "Track and manage your orders" },
   { href: "/wishlist", label: "Wishlist", icon: Heart, description: "Items you've saved for later" },
   { href: "/account", label: "Addresses", icon: MapPin, description: "Manage your saved addresses" },
-  { href: "/login", label: "Log Out", icon: LogOut, description: "Sign out of your account" },
 ];
 
 export default function AccountPage() {
-  const [customer] = getCustomers();
-
   return (
     <div className="container-page py-8">
-      <div className="mb-6 flex items-center gap-3">
+      <div className="mb-8 flex flex-col items-center gap-3 rounded-xl border border-border bg-surface-muted px-6 py-8 text-center">
         <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-light text-primary">
           <User size={26} />
         </span>
         <div>
-          <h1 className="text-xl font-bold text-ink">{customer.name}</h1>
-          <p className="text-sm text-muted">
-            {customer.email} · Joined {formatDate(customer.createdAt)}
-          </p>
+          <h1 className="text-lg font-bold text-ink">You&apos;re not logged in</h1>
+          <p className="text-sm text-muted">Log in to view your orders, wishlist and saved addresses.</p>
         </div>
+        <Button href="/login">Log In</Button>
       </div>
 
-      <p className="mb-6 rounded-lg bg-primary-light px-4 py-2 text-xs text-primary">
-        Showing demo account data — sign-in is not yet connected to a live backend.
-      </p>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {links.map((link) => (
           <Link
             key={link.label}
