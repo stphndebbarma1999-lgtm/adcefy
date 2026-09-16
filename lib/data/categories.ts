@@ -261,7 +261,7 @@ export const categories: Category[] = [
   {
     id: "cat-smartwatches",
     slug: "smartwatches",
-    name: "Smartwatches",
+    name: "Smart Watches",
     description: "Fitness trackers and smartwatches to stay connected on the go.",
     icon: "Watch",
     sortOrder: 7,
