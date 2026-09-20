@@ -32,7 +32,13 @@ export function HeroCarouselClient({ slides }: { slides: Banner[] }) {
   }, [slides.length]);
 
   const scrollToIndex = (index: number) => {
-    slideRefs.current[index]?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+    // scrollIntoView would also drag the page's vertical scroll back up to the
+    // carousel whenever it's off-screen (e.g. autoplay firing while the user
+    // has scrolled down). Scrolling the track's own scrollLeft keeps this
+    // strictly horizontal and local to the carousel.
+    const track = trackRef.current;
+    if (!track) return;
+    track.scrollTo({ left: index * track.clientWidth, behavior: "smooth" });
   };
 
   useEffect(() => {
