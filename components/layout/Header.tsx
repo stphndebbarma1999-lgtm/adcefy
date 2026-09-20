@@ -15,7 +15,6 @@ const categories = getCategories();
 
 const navLinks = [
   { label: "Catalog", href: "/catalog" },
-  { label: "Why ADCEFY", href: "/why-adcefy" },
   { label: "Contact", href: "/contact" },
 ];
 
