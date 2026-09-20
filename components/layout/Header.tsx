@@ -37,9 +37,9 @@ export function Header() {
   }, [categoriesOpen]);
 
   return (
-    <header className="sticky top-0 z-40 bg-white">
+    <header className="sticky top-0 z-40 bg-dark">
       <AnnouncementBar />
-      <div className="border-b border-border">
+      <div className="border-b border-white/10">
         <div className="container-page flex h-20 items-center justify-between gap-4 lg:h-24">
           <Logo imageClassName="h-12 w-auto sm:h-14 lg:h-16" />
 
@@ -48,7 +48,7 @@ export function Header() {
               <button
                 onClick={() => setCategoriesOpen((v) => !v)}
                 aria-expanded={categoriesOpen}
-                className="flex items-center gap-1 text-sm font-semibold text-ink hover:text-primary"
+                className="flex items-center gap-1 text-sm font-semibold text-white hover:text-primary"
               >
                 Categories
                 <ChevronDown size={14} className={categoriesOpen ? "rotate-180 transition-transform" : "transition-transform"} />
@@ -70,7 +70,7 @@ export function Header() {
               )}
             </div>
             {navLinks.map((l) => (
-              <Link key={l.href} href={l.href} className="text-sm font-semibold text-ink hover:text-primary">
+              <Link key={l.href} href={l.href} className="text-sm font-semibold text-white hover:text-primary">
                 {l.label}
               </Link>
             ))}
@@ -80,7 +80,7 @@ export function Header() {
             <Link
               href="/wishlist"
               aria-label="Wishlist"
-              className="relative hidden rounded-lg p-2 text-ink hover:bg-surface-muted sm:block"
+              className="relative hidden rounded-lg p-2 text-white hover:bg-white/10 sm:block"
             >
               <Heart size={22} />
               {wishlistItems.length > 0 && (
@@ -92,32 +92,32 @@ export function Header() {
 
             <Link
               href="/login"
-              className="hidden items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink hover:border-ink lg:flex"
+              className="hidden items-center gap-1.5 rounded-lg border border-white/30 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:border-white lg:flex"
             >
               <LogIn size={15} />
               Sign In
             </Link>
             <Link
               href="/register"
-              className="hidden items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink hover:border-ink lg:flex"
+              className="hidden items-center gap-1.5 rounded-lg border border-white/30 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:border-white lg:flex"
             >
               <UserPlus size={15} />
               Create Account
             </Link>
 
-            <Link href="/account" aria-label="Account" className="rounded-lg p-2 text-ink hover:bg-surface-muted">
+            <Link href="/account" aria-label="Account" className="rounded-lg p-2 text-white hover:bg-white/10">
               <User size={22} />
             </Link>
 
             <button
               onClick={openCart}
               aria-label="Cart"
-              className="relative flex items-center gap-1.5 rounded-lg bg-ink px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-ink/90 sm:px-3.5"
+              className="relative flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold uppercase tracking-wide text-white hover:bg-primary-dark sm:px-3.5"
             >
               <ShoppingCart size={18} />
               <span className="hidden sm:inline">Cart</span>
               {itemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-white">
+                <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[10px] font-semibold text-primary">
                   {itemCount}
                 </span>
               )}
@@ -126,7 +126,7 @@ export function Header() {
         </div>
       </div>
 
-      <div className="border-b border-border bg-surface-muted/50">
+      <div className="border-b border-white/10 bg-dark">
         <div className="container-page py-3">
           <button
             onClick={() => setSearchOpen(true)}
