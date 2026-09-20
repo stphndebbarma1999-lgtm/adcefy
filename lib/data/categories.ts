@@ -32,7 +32,7 @@ export const categories: Category[] = [
   {
     id: "cat-mobile",
     slug: "mobile",
-    name: "Mobile",
+    name: "Mobile Phones",
     description: "Smartphones from the latest flagships to reliable everyday phones.",
     icon: "Smartphone",
     sortOrder: 1,
@@ -107,7 +107,7 @@ export const categories: Category[] = [
   {
     id: "cat-laptop",
     slug: "laptop",
-    name: "Laptop",
+    name: "Laptops",
     description: "Laptops built for work, study, gaming and everyday computing.",
     icon: "Laptop",
     sortOrder: 3,
@@ -261,7 +261,7 @@ export const categories: Category[] = [
   {
     id: "cat-smartwatches",
     slug: "smartwatches",
-    name: "Smart Watches",
+    name: "Watches",
     description: "Fitness trackers and smartwatches to stay connected on the go.",
     icon: "Watch",
     sortOrder: 7,
@@ -330,7 +330,7 @@ export const categories: Category[] = [
   {
     id: "cat-gaming",
     slug: "gaming",
-    name: "Gaming",
+    name: "Gaming Monitors",
     description: "Consoles, controllers and gaming accessories.",
     icon: "Gamepad2",
     sortOrder: 10,
