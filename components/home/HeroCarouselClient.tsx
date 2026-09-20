@@ -10,6 +10,7 @@ export function HeroCarouselClient({ slides }: { slides: Banner[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -34,8 +35,23 @@ export function HeroCarouselClient({ slides }: { slides: Banner[] }) {
     slideRefs.current[index]?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
   };
 
+  useEffect(() => {
+    // Re-armed off activeIndex so a manual swipe (which moves activeIndex via
+    // the IntersectionObserver above) restarts the countdown from there,
+    // instead of firing early or drifting from what's actually on screen.
+    if (slides.length <= 1 || isPaused) return;
+    const timer = setTimeout(() => {
+      scrollToIndex((activeIndex + 1) % slides.length);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [activeIndex, isPaused, slides.length]);
+
   return (
-    <section className="relative w-full">
+    <section
+      className="relative w-full"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       <div
         ref={trackRef}
         className="flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
