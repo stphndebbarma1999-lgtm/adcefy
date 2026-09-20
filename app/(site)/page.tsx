@@ -1,5 +1,4 @@
 import { HeroCarousel } from "@/components/home/HeroCarousel";
-import { CategoryShowcase } from "@/components/home/CategoryShowcase";
 import { InStockSection } from "@/components/home/InStockSection";
 
 // Without this, the homepage uses no dynamic APIs (no cookies/headers/searchParams),
@@ -12,7 +11,6 @@ export default function HomePage() {
   return (
     <>
       <HeroCarousel />
-      <CategoryShowcase />
       <InStockSection />
     </>
   );
