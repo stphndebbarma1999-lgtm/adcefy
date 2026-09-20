@@ -90,23 +90,28 @@ export function ProductCard({ product }: { product: Product }) {
         </Link>
         {getKeySpec(product) && <p className="text-xs text-muted">{getKeySpec(product)}</p>}
         <Rating value={product.rating} reviewCount={product.reviewCount} />
-        <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-base font-bold text-ink">{formatPrice(product.price)}</span>
-          {product.originalPrice && (
-            <span className="text-xs text-muted line-through">{formatPrice(product.originalPrice)}</span>
-          )}
-        </div>
-        {stockStatus === "low-stock" && <p className="text-xs font-medium text-accent-orange">Only {product.stock} left</p>}
-        {stockStatus === "out-of-stock" && <p className="text-xs font-medium text-danger">Out of Stock</p>}
 
-        <button
-          onClick={handleAddToCart}
-          disabled={stockStatus === "out-of-stock"}
-          className="mt-2 flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-medium text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
-        >
-          <ShoppingCart size={16} />
-          Add to Cart
-        </button>
+        {/* Pinned to the bottom so price/button line up across a row even
+            when names/specs above take a different number of lines. */}
+        <div className="mt-auto flex flex-col gap-1.5 pt-1">
+          <div className="flex items-baseline gap-2">
+            <span className="text-base font-bold text-ink">{formatPrice(product.price)}</span>
+            {product.originalPrice && (
+              <span className="text-xs text-muted line-through">{formatPrice(product.originalPrice)}</span>
+            )}
+          </div>
+          {stockStatus === "low-stock" && <p className="text-xs font-medium text-accent-orange">Only {product.stock} left</p>}
+          {stockStatus === "out-of-stock" && <p className="text-xs font-medium text-danger">Out of Stock</p>}
+
+          <button
+            onClick={handleAddToCart}
+            disabled={stockStatus === "out-of-stock"}
+            className="mt-0.5 flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-medium text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            <ShoppingCart size={16} />
+            Add to Cart
+          </button>
+        </div>
       </div>
     </div>
   );
