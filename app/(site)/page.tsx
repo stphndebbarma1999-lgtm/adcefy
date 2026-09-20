@@ -1,4 +1,3 @@
-import { HomeSearchBar } from "@/components/home/HomeSearchBar";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { CategoryShowcase } from "@/components/home/CategoryShowcase";
 import { NewArrivals } from "@/components/home/NewArrivals";
@@ -12,7 +11,6 @@ export const revalidate = 60;
 export default function HomePage() {
   return (
     <>
-      <HomeSearchBar />
       <HeroCarousel />
       <CategoryShowcase />
       <NewArrivals />
