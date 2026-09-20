@@ -43,7 +43,7 @@ export function Header() {
         <div className="container-page flex h-20 items-center justify-between gap-4 lg:h-24">
           <Logo imageClassName="h-12 w-auto sm:h-14 lg:h-16" />
 
-          <nav className="hidden items-center gap-6 lg:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-10 lg:flex" aria-label="Primary">
             <div ref={categoriesRef} className="relative">
               <button
                 onClick={() => setCategoriesOpen((v) => !v)}

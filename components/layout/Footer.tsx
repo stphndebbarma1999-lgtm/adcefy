@@ -37,7 +37,7 @@ export function Footer() {
     <footer className="mt-16 border-t border-white/10 bg-dark pb-20 sm:pb-0">
       <div className="container-page grid grid-cols-2 gap-8 py-12 sm:grid-cols-2 lg:grid-cols-5">
         <div className="col-span-2 flex flex-col gap-4 lg:col-span-1">
-          <Logo />
+          <Logo imageClassName="h-12 w-auto" />
           <p className="text-sm text-white/70">{siteConfig.description}</p>
           <div className="flex items-center gap-3">
             <a
