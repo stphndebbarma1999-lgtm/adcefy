@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Heart, LogIn, Search, ShoppingCart, UserPlus } from "lucide-react";
+import { ChevronDown, Heart, LogIn, Search, ShoppingCart, User, UserPlus } from "lucide-react";
 import { Logo } from "./Logo";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { useCart } from "@/lib/context/CartContext";
@@ -103,6 +103,10 @@ export function Header() {
             >
               <UserPlus size={15} />
               Create Account
+            </Link>
+
+            <Link href="/account" aria-label="Account" className="rounded-lg p-2 text-ink hover:bg-surface-muted">
+              <User size={22} />
             </Link>
 
             <button
