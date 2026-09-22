@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Heart, LogIn, Search, ShoppingCart, User, UserPlus } from "lucide-react";
+import { ChevronDown, Heart, LogIn, ShoppingCart, User, UserPlus } from "lucide-react";
 import { Logo } from "./Logo";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { useCart } from "@/lib/context/CartContext";
 import { useWishlist } from "@/lib/context/WishlistContext";
 import { getCategories } from "@/lib/data/categories";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
-import { SearchOverlay } from "@/components/search/SearchOverlay";
+import { SearchBar } from "@/components/search/SearchBar";
 
 const categories = getCategories();
 
@@ -22,7 +22,6 @@ export function Header() {
   const { itemCount, openCart } = useCart();
   const { items: wishlistItems } = useWishlist();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const categoriesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -128,17 +127,9 @@ export function Header() {
 
       <div className="border-b border-white/10 bg-dark">
         <div className="container-page py-3">
-          <button
-            onClick={() => setSearchOpen(true)}
-            className="flex h-11 w-full items-center gap-2 rounded-lg border border-border bg-white px-3.5 text-sm text-muted hover:border-primary/40"
-          >
-            <Search size={16} />
-            Search the catalog — headphones, laptops, cameras, watches...
-          </button>
+          <SearchBar />
         </div>
       </div>
-
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

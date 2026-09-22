@@ -23,7 +23,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         )}
       </h1>
       <p className="mt-1 mb-6 text-sm text-muted">{results.length} products found</p>
-      <ProductGrid products={results} />
+      <ProductGrid products={results} wide />
     </div>
   );
 }

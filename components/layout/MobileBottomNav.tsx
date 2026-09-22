@@ -9,7 +9,6 @@ import { useCart } from "@/lib/context/CartContext";
 import { getCategories } from "@/lib/data/categories";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { Drawer } from "@/components/ui/Drawer";
-import { SearchOverlay } from "@/components/search/SearchOverlay";
 
 const categories = getCategories();
 
@@ -17,7 +16,6 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const { itemCount, openCart } = useCart();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
 
   const items: {
     key: "home" | "categories" | "search" | "cart" | "account";
@@ -27,7 +25,7 @@ export function MobileBottomNav() {
   }[] = [
     { key: "home", label: "Home", icon: Home, href: "/" },
     { key: "categories", label: "Categories", icon: LayoutGrid },
-    { key: "search", label: "Search", icon: Search },
+    { key: "search", label: "Search", icon: Search, href: "/search" },
     { key: "cart", label: "Cart", icon: ShoppingCart },
     { key: "account", label: "Account", icon: User, href: "/account" },
   ];
@@ -48,14 +46,6 @@ export function MobileBottomNav() {
           if (item.key === "categories") {
             return (
               <button key={item.key} onClick={() => setCategoriesOpen(true)} className={commonClasses}>
-                <item.icon size={22} />
-                {item.label}
-              </button>
-            );
-          }
-          if (item.key === "search") {
-            return (
-              <button key={item.key} onClick={() => setSearchOpen(true)} className={commonClasses}>
                 <item.icon size={22} />
                 {item.label}
               </button>
@@ -101,8 +91,6 @@ export function MobileBottomNav() {
           ))}
         </ul>
       </Drawer>
-
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

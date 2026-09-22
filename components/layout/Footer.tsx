@@ -34,7 +34,7 @@ function gmailComposeUrl(email: string) {
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-white/10 bg-dark pb-20 sm:pb-0">
+    <footer className="mt-16 border-t border-white/10 bg-dark pb-16 sm:pb-0">
       <div className="container-page grid grid-cols-2 gap-8 py-12 sm:grid-cols-2 lg:grid-cols-5">
         <div className="col-span-2 flex flex-col gap-4 lg:col-span-1">
           <Logo imageClassName="h-12 w-auto" />

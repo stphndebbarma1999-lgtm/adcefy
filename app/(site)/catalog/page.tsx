@@ -57,7 +57,7 @@ export default async function CatalogPage({
         })}
       </div>
 
-      <ProductGrid products={filtered} />
+      <ProductGrid products={filtered} wide />
     </div>
   );
 }

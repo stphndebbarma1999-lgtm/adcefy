@@ -5,7 +5,7 @@ import { ProductCard } from "@/components/product/ProductCard";
 
 export async function InStockSection() {
   const allProducts = await getAllProductsAsync();
-  const products = allProducts.filter((p) => p.stock > 0).slice(0, 8);
+  const products = allProducts.filter((p) => p.stock > 0).slice(0, 10);
   if (products.length === 0) return null;
 
   return (
@@ -23,7 +23,7 @@ export async function InStockSection() {
           <ArrowRight size={16} />
         </Link>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-6 xl:grid-cols-10">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
