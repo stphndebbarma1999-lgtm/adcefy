@@ -59,7 +59,7 @@ export async function CategoryPageContent({
           <div className="mb-4 hidden justify-end lg:flex">
             <SortDropdown />
           </div>
-          <ProductGrid products={sorted} wide />
+          <ProductGrid products={sorted} />
         </div>
       </div>
     </div>
