@@ -24,10 +24,11 @@ export const siteConfig = {
 
   contact: {
     operatedBy: "A.D. Computer Enterprise",
+    gstin: "16ACPFA1366G1ZD",
     supportEmail: "contact@adcefy.com",
     supportPhone: "+91 7005212711",
     whatsapp: "+91 9366026432",
-    address: "Mandwi Bazaar, Mandwi Composite Market, Room No. 73, First Floor, West Tripura, 799045",
+    address: "Mandwi Bazaar, Mandwi Composite Market, Room No. 73, First Floor, West Tripura, Tripura – 799045, India",
     businessHours: "Mon–Sat, 9:00 AM – 7:00 PM IST",
   },
 

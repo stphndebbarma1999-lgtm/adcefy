@@ -7,6 +7,7 @@ import { Logo } from "./Logo";
 const categories = getCategories();
 
 const customerServiceLinks = [
+  { label: "About Us", href: "/about" },
   { label: "Contact Us", href: "/contact" },
   { label: "Track Order", href: "/track-order" },
   { label: "Shipping Policy", href: "/shipping-policy" },
