@@ -9,6 +9,7 @@ import {
   Camera,
   Gamepad2,
   Speaker,
+  Mouse,
   type LucideProps,
 } from "lucide-react";
 import type { ComponentType } from "react";
@@ -24,6 +25,7 @@ const iconMap: Record<string, ComponentType<LucideProps>> = {
   Camera,
   Gamepad2,
   Speaker,
+  Mouse,
 };
 
 export function CategoryIcon({ name, ...props }: { name: string } & LucideProps) {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Camera, Mail, MapPin, Users, PlaySquare } from "lucide-react";
+import { Camera, Mail, MapPin, Phone, Store, Users, PlaySquare } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { getCategories } from "@/lib/data/categories";
 import { Logo } from "./Logo";
@@ -113,6 +113,10 @@ export function Footer() {
           <h3 className="mb-4 text-sm font-semibold text-white">Get in Touch</h3>
           <ul className="flex flex-col gap-3">
             <li className="flex items-start gap-2 text-sm text-white/70">
+              <Store size={16} className="mt-0.5 shrink-0" />
+              Operated by: {siteConfig.contact.operatedBy}
+            </li>
+            <li className="flex items-start gap-2 text-sm text-white/70">
               <MapPin size={16} className="mt-0.5 shrink-0" />
               {siteConfig.contact.address}
             </li>
@@ -125,6 +129,15 @@ export function Footer() {
               >
                 <Mail size={16} className="shrink-0" />
                 {siteConfig.contact.supportEmail}
+              </a>
+            </li>
+            <li>
+              <a
+                href={`tel:${siteConfig.contact.supportPhone.replace(/\s+/g, "")}`}
+                className="flex items-center gap-2 text-sm text-white/70 hover:text-primary"
+              >
+                <Phone size={16} className="shrink-0" />
+                {siteConfig.contact.supportPhone}
               </a>
             </li>
           </ul>

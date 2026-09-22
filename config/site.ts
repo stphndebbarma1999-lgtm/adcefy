@@ -23,6 +23,7 @@ export const siteConfig = {
   },
 
   contact: {
+    operatedBy: "A.D. Computer Enterprise",
     supportEmail: "contact@adcefy.com",
     supportPhone: "+91 7005212711",
     whatsapp: "+91 9366026432",

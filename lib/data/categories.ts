@@ -351,6 +351,32 @@ export const categories: Category[] = [
     ],
   },
   {
+    id: "cat-computer-accessories",
+    slug: "computer-accessories",
+    name: "Computer Accessories",
+    description: "Pen drives, external storage, webcams, cooling pads and other computer add-ons.",
+    icon: "Mouse",
+    sortOrder: 12,
+    isActive: true,
+    filters: [
+      {
+        id: "type",
+        label: "Type",
+        type: "checkbox",
+        options: [
+          { label: "Pen Drive", value: "pen-drive" },
+          { label: "External Hard Disk", value: "external-hdd" },
+          { label: "Webcam", value: "webcam" },
+          { label: "Cooling Pad", value: "cooling-pad" },
+          { label: "USB Hub", value: "usb-hub" },
+          { label: "Laptop Bag", value: "laptop-bag" },
+        ],
+      },
+      brandFilter(["Logitech", "SanDisk", "WD", "Seagate", "ADCEFY"]),
+      priceFilter,
+    ],
+  },
+  {
     id: "cat-speakers",
     slug: "speakers",
     name: "Speakers",
